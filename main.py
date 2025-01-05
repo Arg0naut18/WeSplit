@@ -83,7 +83,7 @@ def create_record_function():
     group_id = request.form.get("group_id")
     split_equal = True if request.form.get(
         "is_split_equally") == 'true' else False
-    logger.info(f"Received request to create an {"equal split" if split_equal else "unequal split"} record for group with Id = {group_id}.")
+    logger.info(f"Received request to create an {'equal split' if split_equal else 'unequal split'} record for group with Id = {group_id}.")
     if split_equal:
         paid_by = request.form.get("paid_by")
         to = [name.strip() for name in request.form.get("split_by").split(",")]
@@ -110,7 +110,7 @@ def summarize_transactions():
         group_id = request.args.get("archiveGroupId")
     else:
         group_id = request.args.get("groupId")
-    logger.info(f"Summarize request received for {"an archive group" if is_archive else "a group"} with Id: {group_id}")
+    logger.info(f"Summarize request received for {'an archive group' if is_archive else 'a group'} with Id: {group_id}")
     group_details = ledger.get_group_details(
         group_id=group_id, archive=is_archive)
     summary_url = None
@@ -120,11 +120,11 @@ def summarize_transactions():
         archive_id = ledger.archive_group(group_id=group_id, summary=summary)
         summary_url = request.url.rsplit(
             "/", 1)[0]+"/summarize?archiveGroupId="+archive_id
-        logger.info(f"Summarized successfully for {group_details["name"]}({group_id})!")
+        logger.info(f"Summarized successfully for {group_details['name']}({group_id})!")
     else:
         summary = group_details["summary"]
         valid_till = group_details["valid_till"]
-        logger.info(f"Archived summary of {group_details["name"]}({group_id}) was presented!")
+        logger.info(f"Archived summary of {group_details['name']}({group_id}) was presented!")
     return render_template(
         template_name_or_list="summary.html",
         group_name=group_details["name"],
