@@ -1,0 +1,33 @@
+body {
+    background-color: #60519f;
+}
+
+.group-form, .verify-form, .group-box, .group-url-box, .summary-box {
+    max-width: 700px; /* Adjust the maximum width as needed */
+    min-width: 400px;
+    padding: 25px; /* Add padding inside the form container */
+    border: 2px solid #ccc; /* Optional: Add a border for better visualization */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    background-color: #f8f9fa; /* Optional: Add a background color */
+}
+
+.names-helper-text {
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.floating-button {
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    float: right;
+}
