@@ -31,3 +31,12 @@ body {
     z-index: 1000;
     float: right;
 }
+
+.uneven-select {
+    width: auto;
+    max-width: 7rem;
+}
+
+table {
+    border-spacing: 30px;
+}

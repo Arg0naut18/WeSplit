@@ -16,8 +16,11 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9048145743735747"
-     crossorigin="anonymous"></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9048145743735747"
+      crossorigin="anonymous"
+    ></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </head>
@@ -108,35 +111,41 @@
                       Split Unequally
                     </button>
                   </div>
-                  <input
-                    type="hidden"
-                    name="group_id"
-                    id="group_id"
-                    value="{{group_id}}"
-                  />
-                  <input
-                    type="hidden"
-                    name="group_members"
-                    id="group_members"
-                    value="{{group_members}}"
-                  />
-                  <input
-                    type="hidden"
-                    name="is_split_equally"
-                    id="is_split_equally"
-                  />
+                  <div id="hidden-params">
+                    <input
+                      type="hidden"
+                      name="group_id"
+                      id="group_id"
+                      value="{{group_id}}"
+                    />
+                    <input
+                      type="hidden"
+                      name="group_members"
+                      id="group_members"
+                      value="{{group_members}}"
+                    />
+                    <input
+                      type="hidden"
+                      name="is_split_equally"
+                      id="is_split_equally"
+                    />
+                  </div>
                   <div id="splitEquallyForm">
                     <table>
                       <tbody>
                         <tr>
-                          <th><label for="paid_by">Paid By:</label></th>
+                          <th>
+                            <label for="paid_by"
+                              >Paid By:</label
+                            >
+                          </th>
                           <td colspan="3">
-                            <input
-                              id="paid_by"
-                              class="validation-param"
-                              type="text"
-                              name="paid_by"
-                            />
+                            <select class="form-select validation-param" id="paid_by" name="paid_by">
+                              <option selected></option>
+                              {% for member in group_members.split(',') %}
+                              <option value="{{member}}">{{member}}</option>
+                              {% endfor %}
+                            </select>
                           </td>
                         </tr>
                         <tr>
@@ -253,6 +262,7 @@
                       errorMessage = "Blank item encountered: " + item.name;
                       return;
                     }
+                    console.log(item.name + "->" + item.value);
                     objMap.set(item.name, item.value);
                   });
                   if (!isValid) {
@@ -263,6 +273,9 @@
                     .get("split_by")
                     .split(",")
                     .map((x) => x.trim());
+                  console.log(group_members);
+                  console.log(paid_by);
+                  console.log(split_by);
                   isValid =
                     group_members.includes(paid_by) === true &&
                     isSubset(split_by, group_members);
@@ -288,16 +301,16 @@
                   let isValid = true;
                   let errorMessage;
                   rows.forEach((row, index) => {
-                    const paid_by_row = row.querySelector(
-                      'input[name="expense_by"]'
+                    let paid_by_row = row.querySelector(
+                      'select[name="expense_by"]'
                     ).value;
-                    const split_by_row = row.querySelector(
+                    let split_by_row = row.querySelector(
                       'input[name="expense_to"]'
                     ).value;
-                    const amount = row.querySelector(
+                    let amount = row.querySelector(
                       'input[name="expense_amount"]'
                     ).value;
-                    const description = row.querySelector(
+                    let description = row.querySelector(
                       'input[name="expense_description"]'
                     ).value;
                     if (isNoneOrEmpty(paid_by_row)) {
@@ -341,18 +354,18 @@
               }
 
               try {
-                const splitEquallyBtn =
+                let splitEquallyBtn =
                   document.getElementById("splitEquallyBtn");
-                const splitUnequallyBtn =
+                let splitUnequallyBtn =
                   document.getElementById("splitUnequallyBtn");
-                const splitEquallyForm =
+                let splitEquallyForm =
                   document.getElementById("splitEquallyForm");
-                const splitUnequallyForm =
+                let splitUnequallyForm =
                   document.getElementById("splitUnequallyForm");
-                const transactionForm =
+                let transactionForm =
                   document.getElementById("transaction_form");
-                const expenseButton = document.getElementById("addExpenseBtn");
-                const summarizeButton = document.getElementById("summarizeBtn");
+                let expenseButton = document.getElementById("addExpenseBtn");
+                let summarizeButton = document.getElementById("summarizeBtn");
                 let isSplitEqual = true;
 
                 splitEquallyBtn.addEventListener("click", () => {
@@ -402,29 +415,40 @@
                 });
 
                 expenseButton.addEventListener("click", function () {
-                  const tableBody = document.querySelector(
+                  let tableBody = document.querySelector(
                     "#expensesTable tbody"
                   );
-                  const newRow = document.createElement("tr");
+                  let groupMembers = document
+                    .getElementById("group_members")
+                    .value.split(",")
+                    .map((x) => x.trim());
+                  let newRow = document.createElement("tr");
 
-                  const byCell = document.createElement("td");
-                  const byInput = document.createElement("input");
-                  byInput.type = "text";
+                  let byCell = document.createElement("td");
+                  let byInput = document.createElement("select");
+                  byInput.className = "form-select uneven-select";
                   byInput.name = "expense_by";
-                  byInput.placeholder = "By";
-                  byInput.className = "form-control";
+                  let byDefaultOption = document.createElement("option");
+                  byDefaultOption.selected = true;
+                  byInput.appendChild(byDefaultOption);
+                  groupMembers.forEach((member) => {
+                    let byOption = document.createElement("option");
+                    byOption.value = member;
+                    byOption.text = member;
+                    byInput.appendChild(byOption);
+                  });
                   byCell.appendChild(byInput);
 
-                  const toCell = document.createElement("td");
-                  const toInput = document.createElement("input");
+                  let toCell = document.createElement("td");
+                  let toInput = document.createElement("input");
                   toInput.type = "text";
                   toInput.name = "expense_to";
                   toInput.placeholder = "To";
                   toInput.className = "form-control";
                   toCell.appendChild(toInput);
 
-                  const amountCell = document.createElement("td");
-                  const amountInput = document.createElement("input");
+                  let amountCell = document.createElement("td");
+                  let amountInput = document.createElement("input");
                   amountInput.type = "number";
                   amountInput.name = "expense_amount";
                   amountInput.placeholder = "Amount";
@@ -433,16 +457,16 @@
                   amountInput.step = 0.01;
                   amountCell.appendChild(amountInput);
 
-                  const descriptionCell = document.createElement("td");
-                  const descriptionInput = document.createElement("input");
+                  let descriptionCell = document.createElement("td");
+                  let descriptionInput = document.createElement("input");
                   descriptionInput.type = "text";
                   descriptionInput.name = "expense_description";
                   descriptionInput.placeholder = "Description";
                   descriptionInput.className = "form-control";
                   descriptionCell.appendChild(descriptionInput);
 
-                  const actionCell = document.createElement("td");
-                  const deleteBtn = document.createElement("button");
+                  let actionCell = document.createElement("td");
+                  let deleteBtn = document.createElement("button");
                   deleteBtn.type = "button";
                   deleteBtn.className = "btn btn-danger";
                   deleteBtn.textContent = "Delete";
