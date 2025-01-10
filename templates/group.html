@@ -262,7 +262,6 @@
                       errorMessage = "Blank item encountered: " + item.name;
                       return;
                     }
-                    console.log(item.name + "->" + item.value);
                     objMap.set(item.name, item.value);
                   });
                   if (!isValid) {
@@ -273,9 +272,6 @@
                     .get("split_by")
                     .split(",")
                     .map((x) => x.trim());
-                  console.log(group_members);
-                  console.log(paid_by);
-                  console.log(split_by);
                   isValid =
                     group_members.includes(paid_by) === true &&
                     isSubset(split_by, group_members);
@@ -305,7 +301,7 @@
                       'select[name="expense_by"]'
                     ).value;
                     let split_by_row = row.querySelector(
-                      'input[name="expense_to"]'
+                      'select[name="expense_to"]'
                     ).value;
                     let amount = row.querySelector(
                       'input[name="expense_amount"]'
@@ -440,11 +436,19 @@
                   byCell.appendChild(byInput);
 
                   let toCell = document.createElement("td");
-                  let toInput = document.createElement("input");
-                  toInput.type = "text";
+                  let toInput = document.createElement("select");
+                  toInput.className = "form-select uneven-select";
                   toInput.name = "expense_to";
-                  toInput.placeholder = "To";
-                  toInput.className = "form-control";
+                  let toDefaultOption = document.createElement("option");
+                  toDefaultOption.selected = true;
+                  toInput.appendChild(toDefaultOption);
+                  groupMembers.forEach((member) => {
+                    let toOption = document.createElement("option");
+                    toOption.value = member;
+                    toOption.text = member;
+                    toInput.appendChild(toOption);
+                  });
+                  toCell.appendChild(toInput);
                   toCell.appendChild(toInput);
 
                   let amountCell = document.createElement("td");
