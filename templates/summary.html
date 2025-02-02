@@ -12,40 +12,50 @@
     />
     <link href="static/css/style.css" rel="stylesheet" />
     <link rel="icon" href="static\images\WeSplit.png" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9048145743735747"
-     crossorigin="anonymous"></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9048145743735747"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body class="d-flex align-items-center justify-content-center vh-100">
     <div class="summary-box">
       <h2>Summary Table of {{ group_name }}</h2>
       {% if summary_url %}
       <h4>
-        Please save this URL to access the summary anytime you want:<br /><a href="{{ summary_url }}">{{
-        summary_url }}</a>
+        Please save this URL to access the summary anytime you want:<br /><a
+          href="{{ summary_url }}"
+          >{{ summary_url }}</a
+        >
       </h4>
       {% endif %}
-      <table class="table table-dark table-hover table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Needs to pay</th>
-            <th scope="col">To Be Payed</th>
-            <th scope="col">Amount</th>
-          </tr>
-        </thead>
-        <tbody class="table-group-divider">
-          {% for item in summary %}
-          <tr>
-            <th scope="row">{{ loop.index }}</th>
-            <td>{{ item.to }}</td>
-            <td>{{ item.by }}</td>
-            <td>{{ item.amount }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Needs to pay</th>
+              <th scope="col">To Be Payed</th>
+              <th scope="col">Amount</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            {% for item in summary %}
+            <tr>
+              <th scope="row">{{ loop.index }}</th>
+              <td>{{ item.to }}</td>
+              <td>{{ item.by }}</td>
+              <td>{{ item.amount }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
       {% if valid_till %}
-      <p>You are seeing an archived summary. This data will be retained only till {{ valid_till }}</p>
+      <p>
+        You are seeing an archived summary. This data will be retained only till
+        {{ valid_till }}
+      </p>
       {% endif %}
     </div>
   </body>
