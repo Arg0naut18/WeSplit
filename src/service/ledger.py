@@ -26,7 +26,7 @@ class Ledger:
         collection = self.collection if not archive else self.archive
         doc = collection.find_one({"_id": ObjectId(group_id)})
         if doc:
-            return {"name": doc["group_name"], "ledger": doc["ledger"], "members": doc["members"], "description": doc["description"], "summary": None if not archive else doc["summary"], "valid_till": None if not archive else (doc["deleted_at"]+relativedelta(years=2)).strftime("%d-%m-%Y %H:%M")}
+            return {"name": doc["group_name"], "ledger": doc["ledger"], "members": doc["members"], "description": doc["description"], "summary": None if not archive else doc["summary"], "valid_till": None if not archive else (doc["deleted_at"]+relativedelta(years=2)).strftime("%d-%m-%Y %H:%M"), "is_simplified": doc["is_simplified"] if "is_simplified" in doc else False}
         else:
             return None
 
@@ -76,3 +76,8 @@ class Ledger:
         archive = self.archive.insert_one(document=doc)
         self.collection.delete_one({"_id": ObjectId(group_id)})
         return str(archive.inserted_id)
+
+    def simplify_archive_group(self, group_id, summary) -> str:
+        new_summary = { "$set": { 'summary': summary, 'is_simplified': True }}
+        updated_record = self.archive.update_one({"_id": ObjectId(group_id)}, new_summary)
+        return updated_record.upserted_id

@@ -51,6 +51,11 @@
           </tbody>
         </table>
       </div>
+      {% if not simple %}
+      <div class="simple">
+        <p>Want a more simplified version of the same summary? <a href="/summarize?archiveGroupId={{group_id}}&simple=true">Click here</a> for it.</p>
+      </div>
+      {% endif %}
       {% if valid_till %}
       <p>
         You are seeing an archived summary. This data will be retained only till

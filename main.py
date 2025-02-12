@@ -4,11 +4,13 @@ from waitress import serve
 from configs import EndpointConfigs
 from typing import List, Dict
 from src.utils.logger import logger
+from collections import defaultdict
 
 
 app = Flask(__name__)
 app.secret_key = EndpointConfigs.app_key
 ledger = Ledger()
+HOME_PATH = "/home"
 
 
 def generate_summary(ledger: List[Dict[str, any]]) -> List[Dict[str, any]]:
@@ -31,12 +33,77 @@ def generate_summary(ledger: List[Dict[str, any]]) -> List[Dict[str, any]]:
     for (key, value) in data_dict.items():
         by, to = key.split("->")
         result.append({"by": by, "to": to, "amount": value})
+    logger.info(result)
+    result.sort(key=lambda x: x["to"])
+    logger.info(result)
     return result
+
+
+def simplify(transactions):
+    net_balances = defaultdict(float)
+
+    for t in transactions:
+        amount = t['amount']
+        net_balances[t['to']] -= amount
+        net_balances[t['by']] += amount
+
+    debtors = []
+    creditors = []
+    for user, balance in net_balances.items():
+        if balance < 0:
+            debtors.append((user, -balance))
+        elif balance > 0:
+            creditors.append((user, balance))
+
+    debtors.sort(key=lambda x: -x[1])
+    creditors.sort(key=lambda x: -x[1])
+
+    simplified = []
+    d_idx = 0
+    c_idx = 0
+
+    while d_idx < len(debtors) and c_idx < len(creditors):
+        curr_debtor, debt_amt = debtors[d_idx]
+        curr_creditor, credit_amt = creditors[c_idx]
+
+        settle_amt = min(debt_amt, credit_amt)
+        simplified.append({
+            'to': curr_debtor,
+            'by': curr_creditor,
+            'amount': settle_amt
+        })
+
+        debt_amt -= settle_amt
+        credit_amt -= settle_amt
+
+        if debt_amt < 1e-9:
+            d_idx += 1
+        else:
+            debtors[d_idx] = (curr_debtor, debt_amt)
+
+        if credit_amt < 1e-9:
+            c_idx += 1
+        else:
+            creditors[c_idx] = (curr_creditor, credit_amt)
+
+    return simplified
+
+
+def get_summary(group_id, group_details, wants_simplified) -> tuple[bool, List[Dict[str, any]]]:
+    if wants_simplified:
+        if "simplified" in group_details:
+            return True, group_details["simplified"]
+        else:
+            summary = simplify(group_details["summary"])
+            ledger.simplify_archive_group(
+                group_id=group_id, summary=summary)
+            return True, summary
+    return False, group_details["summary"]
 
 
 @app.route("/")
 @app.route("/index")
-@app.route("/home")
+@app.route(HOME_PATH)
 def home():
     group_url = request.args.get("group_url")
     return render_template(template_name_or_list="index.html", group_url=group_url)
@@ -46,11 +113,11 @@ def home():
 def group_page():
     group_id = request.args.get("groupId")
     if group_id is None:
-        return redirect("/home")
+        return redirect(HOME_PATH)
     logger.info(f"Group target request received for group id: {group_id}")
     group_details = ledger.get_group_details(group_id=group_id)
     if group_details is None:
-        return redirect("/home")
+        return redirect(HOME_PATH)
     logger.info(f"Loading group id: {group_id}")
     return render_template(
         template_name_or_list="group.html",
@@ -83,7 +150,8 @@ def create_record_function():
     group_id = request.form.get("group_id")
     split_equal = True if request.form.get(
         "is_split_equally") == 'true' else False
-    logger.info(f"Received request to create an {'equal split' if split_equal else 'unequal split'} record for group with Id = {group_id}.")
+    logger.info(
+        f"Received request to create an {'equal split' if split_equal else 'unequal split'} record for group with Id = {group_id}.")
     if split_equal:
         paid_by = request.form.get("paid_by")
         to = [name.strip() for name in request.form.get("split_by").split(",")]
@@ -105,29 +173,44 @@ def create_record_function():
 @app.route("/summarize", methods=["GET"])
 def summarize_transactions():
     is_archive = False
+    is_simple = False
+    archive_group_id = None
     if request.args.get("archiveGroupId"):
         is_archive = True
         group_id = request.args.get("archiveGroupId")
+        archive_group_id = group_id
+        wants_simplified = True if "simple" in request.args and request.args.get(
+            "simple") == "true" else False
     else:
         group_id = request.args.get("groupId")
-    logger.info(f"Summarize request received for {'an archive group' if is_archive else 'a group'} with Id: {group_id}")
+    logger.info(
+        f"Summarize request received for {'an archive group' if is_archive else 'a group'} with Id: {group_id}")
     group_details = ledger.get_group_details(
         group_id=group_id, archive=is_archive)
+    if group_details is None:
+        return redirect(HOME_PATH)
     summary_url = None
     valid_till = None
+    is_simple = group_details["is_simplified"]
     if not is_archive:
         summary = generate_summary(group_details["ledger"])
-        archive_id = ledger.archive_group(group_id=group_id, summary=summary)
+        archive_group_id = ledger.archive_group(
+            group_id=group_id, summary=summary)
         summary_url = request.url.rsplit(
-            "/", 1)[0]+"/summarize?archiveGroupId="+archive_id
-        logger.info(f"Summarized successfully for {group_details['name']}({group_id})!")
+            "/", 1)[0]+"/summarize?archiveGroupId="+archive_group_id
+        logger.info(
+            f"Summarized successfully for {group_details['name']}({group_id})!")
     else:
-        summary = group_details["summary"]
+        is_simple, summary = get_summary(
+            group_id=group_id, group_details=group_details, wants_simplified=wants_simplified)
         valid_till = group_details["valid_till"]
-        logger.info(f"Archived summary of {group_details['name']}({group_id}) was presented!")
+        logger.info(
+            f"Archived summary of {group_details['name']}({group_id}) was presented!")
     return render_template(
         template_name_or_list="summary.html",
+        group_id=archive_group_id,
         group_name=group_details["name"],
+        simple=is_simple,
         summary=summary,
         summary_url=summary_url,
         valid_till=valid_till
