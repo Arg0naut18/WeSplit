@@ -5,12 +5,14 @@ from configs import EndpointConfigs
 from typing import List, Dict
 from src.utils.logger import logger
 from collections import defaultdict
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 EPSILON = 1e-9  # Threshold for floating point comparison
 
 
 app = Flask(__name__)
 app.secret_key = EndpointConfigs.app_key
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 ledger = Ledger()
 HOME_PATH = "/home"
 
