@@ -119,10 +119,47 @@ endblock %} {% block content %}
   (function () {
     "use strict";
     var forms = document.querySelectorAll(".needs-validation");
+
+    // Helpers for participants field sanitization/validation
+    const namesTextarea = document.getElementById("nameTextarea");
+    const sanitizeNames = (raw) => {
+      if (!raw) return "";
+      // Remove spaces around commas, collapse multiple commas, trim commas at ends
+      const collapsed = raw
+        .replace(/\s*,\s*/g, ",")
+        .replace(/,+/g, ",")
+        .replace(/^,|,$/g, "");
+      // Re-join with ", " for readability
+      return collapsed
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .join(", ");
+    };
+    const getValidNames = (raw) => {
+      return (raw || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    };
+
     Array.prototype.slice.call(forms).forEach(function (form) {
       form.addEventListener(
         "submit",
         function (event) {
+          // Sanitize participants before validating/submitting
+          if (namesTextarea) {
+            namesTextarea.value = sanitizeNames(namesTextarea.value);
+            const names = getValidNames(namesTextarea.value);
+            if (names.length < 2) {
+              namesTextarea.setCustomValidity(
+                "Please enter at least two participant names, separated by commas."
+              );
+            } else {
+              namesTextarea.setCustomValidity("");
+            }
+          }
+
           if (!form.checkValidity()) {
             event.preventDefault();
             event.stopPropagation();
