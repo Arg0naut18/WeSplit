@@ -1,94 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Group {{group_name}}</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <link href="static/css/style.css" rel="stylesheet" />
-    <link rel="icon" href="static\images\WeSplit.png" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    />
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9048145743735747"
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </head>
-  <body class="d-flex align-items-center justify-content-center vh-100">
-    <div class="group-box">
-      <h2>{{ group_name }}'s Ledger:</h2>
-      <h5>{{ group_description }}</h5>
-      <br />
-      <div class="ledger-table">
-        <div class="table-responsive">
-          <table class="table table-dark table-hover table-striped">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Paid By</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Split B/W</th>
-                <th scope="col">Description</th>
-              </tr>
-            </thead>
-            <tbody class="table-group-divider table-responsive">
-              {% for item in ledger %}
-              <tr>
-                <th scope="row">{{ loop.index }}</th>
-                <td>{{ item.by }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.to }}</td>
-                <td>{{ item.description }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+{% extends "base.html" %}
+
+{% block title %}{{ group_name }} - WeSplit{% endblock %}
+
+{% block extra_head %}
+<script src="static/js/expense.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-4">
+  <div class="container d-flex justify-content-center">
+    <div class="group-box card">
+      <div class="card-header bg-transparent border-0">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <div>
+              <h2 class="mb-1 d-flex align-items-center">
+                <img src="static/images/WeSplit.png" alt="WeSplit" class="logo-sm me-2">
+                {{ group_name }}
+              </h2>
+              <p class="text-muted mb-0">{{ group_description }}</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-primary" onclick="confirmSummarize()">
+                <i class="bi bi-calculator me-2"></i>View Summary
+              </button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRecordModal">
+                <i class="bi bi-plus-lg me-2"></i>Add Expense
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="group_page_buttons">
-          <button
-            type="button"
-            class="btn btn-lg add-record floating-button"
-            data-bs-toggle="modal"
-            data-bs-target="#createRecordModal"
-            title="Add Transaction"
-          >
-            <i class="bi bi-plus-square-fill"></i>
-          </button>
-          <button
-            type="submit"
-            class="btn btn-lg summarize-button floating-button"
-            id="summarizeBtn"
-            title="Generate Summary"
-          >
-            <a href="/summarize?groupId={{ group_id }}"
-              ><i class="bi bi-calculator"></i
-            ></a>
-          </button>
+
+        <div class="card-body p-0">
+          {% if ledger %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Paid By</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Split Between</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in ledger %}
+                <tr>
+                  <th scope="row">{{ loop.index }}</th>
+                  <td>
+                    <span class="badge bg-primary">{{ item.by }}</span>
+                  </td>
+                  <td>
+                    <strong>₹{{ "%.2f"|format(item.amount) }}</strong>
+                  </td>
+                  <td>
+                    {% for person in item.to.split(',') %}
+                    <span class="badge bg-secondary me-1">{{ person.strip() }}</span>
+                    {% endfor %}
+                  </td>
+                  <td>{{ item.description }}</td>
+                  <td class="text-muted">{{ item.timestamp.strftime('%d %b, %Y') if item.timestamp else '' }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-receipt text-muted icon-lg"></i>
+            <h4 class="mt-3">No Expenses Yet</h4>
+            <p class="text-muted">Start by adding your first expense!</p>
+            <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#createRecordModal">
+              <i class="bi bi-plus-lg me-2"></i>Add Expense
+            </button>
+          </div>
+          {% endif %}
         </div>
         <div
-          class="modal"
+          class="modal fade"
           id="createRecordModal"
           tabindex="-1"
           aria-labelledby="createRecordLabel"
           aria-hidden="true"
         >
-          <div class="modal-dialog modal-dialog-centered">
-            <form id="transaction_form" action="/create-record" method="POST">
+          <div class="modal-dialog modal-dialog-centered expense-modal">
+            <form id="transaction_form" action="/create-record" method="POST" class="needs-validation w-100" novalidate>
               <div class="modal-content">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5" id="createRecordLabel">
-                    Add Transaction
-                  </h1>
+                <div class="modal-header border-0">
+                  <h5 class="modal-title" id="createRecordLabel">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Add New Expense
+                  </h5>
                   <button
                     type="button"
                     class="btn-close"
@@ -96,418 +98,124 @@
                     aria-label="Close"
                   ></button>
                 </div>
-                <div class="modal-body">
-                  <div id="splitOptions">
-                    <button
-                      type="button"
-                      class="btn btn-primary"
-                      id="splitEquallyBtn"
-                    >
-                      Split Equally
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-secondary"
-                      id="splitUnequallyBtn"
-                    >
-                      Split Unequally
-                    </button>
+                <div class="modal-body px-4">
+                  <div id="splitOptions" class="mb-4">
+                    <label class="form-label">How do you want to split the expense?</label>
+                    <div class="d-flex gap-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="splitType" id="splitEquallyRadio" value="equal" checked>
+                        <label class="form-check-label" for="splitEquallyRadio">
+                          <i class="bi bi-distribute-vertical me-2"></i>Split Equally
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="splitType" id="splitUnequallyRadio" value="unequal">
+                        <label class="form-check-label" for="splitUnequallyRadio">
+                          <i class="bi bi-ui-checks-grid me-2"></i>Split Unequally
+                        </label>
+                      </div>
+                    </div>
                   </div>
+
                   <div id="hidden-params">
-                    <input
-                      type="hidden"
-                      name="group_id"
-                      id="group_id"
-                      value="{{group_id}}"
-                    />
-                    <input
-                      type="hidden"
-                      name="group_members"
-                      id="group_members"
-                      value="{{group_members}}"
-                    />
-                    <input
-                      type="hidden"
-                      name="is_split_equally"
-                      id="is_split_equally"
-                    />
+                    <input type="hidden" name="group_id" id="group_id" value="{{group_id}}" />
+                    <input type="hidden" name="group_members" id="group_members" value="{{group_members}}" />
+                    <input type="hidden" name="is_split_equally" id="is_split_equally" value="true" />
                   </div>
+
                   <div id="splitEquallyForm">
-                    <table>
-                      <tbody>
-                        <tr>
-                          <th>
-                            <label for="paid_by">Paid By:</label>
-                          </th>
-                          <td colspan="3">
-                            <select
-                              class="form-select validation-param"
-                              id="paid_by"
-                              name="paid_by"
-                            >
-                              <option selected></option>
-                              {% for member in group_members.split(',') %}
-                              <option value="{{member}}">{{member}}</option>
-                              {% endfor %}
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th><label for="split_by">Split By:</label></th>
-                          <td>
-                            <textarea
-                              id="split_by"
-                              rows="3"
-                              aria-describedby="splitByHelpText"
-                              name="split_by"
-                              class="validation-param"
-                            ></textarea>
-                          </td>
-                          <td colspan="2">
-                            <span
-                              id="splitByHelpText"
-                              class="form-text helper-text"
-                              >Enter all the user names who are part of the
-                              split (including yours if applicable).</span
-                            >
-                          </td>
-                        </tr>
-                        <tr>
-                          <th><label for="amount">Amount:</label></th>
-                          <td colspan="3">
-                            <input
-                              id="amount"
-                              type="number"
-                              name="amount"
-                              min="0"
-                              step="0.01"
-                              class="validation-param"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th><label for="description">Description:</label></th>
-                          <td colspan="3">
-                            <textarea
-                              id="description"
-                              rows="3"
-                              name="description"
-                              class="validation-param"
-                            ></textarea>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div class="mb-3">
+                      <label for="paid_by" class="form-label">Paid By</label>
+                      <select class="form-select" id="paid_by" name="paid_by" required>
+                        <option value="">Select who paid</option>
+                        {% for member in group_members.split(',') %}
+                        <option value="{{member}}">{{member}}</option>
+                        {% endfor %}
+                      </select>
+                      <div class="invalid-feedback">Please select who paid for this expense.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="amount" class="form-label">Amount</label>
+                      <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" class="form-control" id="amount" name="amount" min="0" step="0.01" required placeholder="0.00">
+                        <div class="invalid-feedback">Please enter a valid amount.</div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="split_by" class="form-label">Split Between</label>
+                      <select class="form-select" id="split_by" name="split_by[]" multiple size="4" required>
+                        {% for member in group_members.split(',') %}
+                        <option value="{{member}}">{{member}}</option>
+                        {% endfor %}
+                      </select>
+                      <div class="form-text">Hold Ctrl/Cmd to select multiple people</div>
+                      <div class="invalid-feedback">Please select at least two people to split between.</div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="description" class="form-label">Description</label>
+                      <textarea class="form-control" id="description" name="description" rows="2" required placeholder="What was this expense for?"></textarea>
+                      <div class="invalid-feedback">Please provide a description for this expense.</div>
+                    </div>
                   </div>
                   <div id="splitUnequallyForm" class="d-none">
-                    <table class="table" id="expensesTable">
-                      <thead>
-                        <tr>
-                          <th>Split By</th>
-                          <th>To</th>
-                          <th>Amount</th>
-                          <th>Description</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody></tbody>
-                    </table>
+                    <div class="table-responsive">
+                      <table class="table align-middle" id="expensesTable">
+                        <thead>
+                          <tr>
+                            <th>Paid By</th>
+                            <th>To</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
                     <button
                       type="button"
-                      class="btn btn-success"
+                      class="btn btn-primary w-100"
                       id="addExpenseBtn"
                     >
-                      Add Expense
+                      <i class="bi bi-plus-lg me-2"></i>Add Another Split
                     </button>
                   </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer border-0 px-4 pb-4">
                   <button
                     type="button"
-                    class="btn btn-secondary"
+                    class="btn btn-lg btn-light"
                     data-bs-dismiss="modal"
                   >
-                    Close
+                    Cancel
                   </button>
-                  <input
+                  <button
                     type="submit"
-                    class="btn btn-primary"
-                    value="Save changes"
-                  />
+                    class="btn btn-lg btn-primary px-4"
+                  >
+                    Save Expense
+                  </button>
                 </div>
               </div>
             </form>
-            <script>
-              function isSubset(subset, superset) {
-                try {
-                  return subset.every((element) => superset.includes(element));
-                } catch (e) {
-                  console.error(e);
-                  return false;
-                }
-              }
-
-              function isNoneOrEmpty(str) {
-                return str === null || str === undefined || str.trim() === "";
-              }
-
-              function validateEqualSplit(group_members) {
-                try {
-                  let fields = document.querySelectorAll(
-                    "#transaction_form .validation-param"
-                  );
-                  let flatObj = [...fields];
-                  let objMap = new Map();
-                  let isValid = true;
-                  let errorMessage;
-                  flatObj.forEach((item) => {
-                    if (isNoneOrEmpty(item.value)) {
-                      isValid = false;
-                      errorMessage = "Blank item encountered: " + item.name;
-                      return;
-                    }
-                    objMap.set(item.name, item.value);
-                  });
-                  if (!isValid) {
-                    return { valid: isValid, error: errorMessage };
-                  }
-                  let paid_by = objMap.get("paid_by");
-                  let split_by = objMap
-                    .get("split_by")
-                    .split(",")
-                    .map((x) => x.trim());
-                  isValid =
-                    group_members.includes(paid_by) === true &&
-                    isSubset(split_by, group_members);
-                  return {
-                    valid: isValid,
-                    error: isValid
-                      ? ""
-                      : "The users involved do not belong to this group!",
-                  };
-                } catch (e) {
-                  console.error(e);
-                  return { valid: false, error: e };
-                }
-              }
-
-              function validateUnequalSplit(group_members) {
-                try {
-                  let rows = document.querySelectorAll(
-                    "#expensesTable tbody tr"
-                  );
-                  let paid_by = [];
-                  let split_by = [];
-                  let isValid = true;
-                  let errorMessage;
-                  rows.forEach((row, index) => {
-                    let paid_by_row = row.querySelector(
-                      'select[name="expense_by"]'
-                    ).value;
-                    let split_by_row = row.querySelector(
-                      'select[name="expense_to"]'
-                    ).value;
-                    let amount = row.querySelector(
-                      'input[name="expense_amount"]'
-                    ).value;
-                    let description = row.querySelector(
-                      'input[name="expense_description"]'
-                    ).value;
-                    if (isNoneOrEmpty(paid_by_row)) {
-                      isValid = false;
-                      errorMessage = "Blank item encountered: Paid By";
-                    }
-                    if (isNoneOrEmpty(split_by_row)) {
-                      isValid = false;
-                      errorMessage = "Blank item encountered: Split By";
-                    }
-                    if (isNoneOrEmpty(amount)) {
-                      isValid = false;
-                      errorMessage = "Blank item encountered: Amount";
-                    }
-                    if (isNoneOrEmpty(description)) {
-                      isValid = false;
-                      errorMessage = "Blank item encountered: Description";
-                    }
-                    if (!isValid) {
-                      return;
-                    }
-                    paid_by.push(paid_by_row);
-                    split_by.push(split_by_row);
-                  });
-                  if (!isValid) {
-                    return { valid: false, error: errorMessage };
-                  }
-                  isValid =
-                    isSubset(paid_by, group_members) &&
-                    isSubset(split_by, group_members);
-                  return {
-                    valid: isValid,
-                    error: isValid
-                      ? ""
-                      : "The users involved do not belong to this group!",
-                  };
-                } catch (e) {
-                  console.error(e);
-                  return { valid: false, error: e };
-                }
-              }
-
-              try {
-                let splitEquallyBtn =
-                  document.getElementById("splitEquallyBtn");
-                let splitUnequallyBtn =
-                  document.getElementById("splitUnequallyBtn");
-                let splitEquallyForm =
-                  document.getElementById("splitEquallyForm");
-                let splitUnequallyForm =
-                  document.getElementById("splitUnequallyForm");
-                let transactionForm =
-                  document.getElementById("transaction_form");
-                let expenseButton = document.getElementById("addExpenseBtn");
-                let summarizeButton = document.getElementById("summarizeBtn");
-                let isSplitEqual = true;
-
-                splitEquallyBtn.addEventListener("click", () => {
-                  splitEquallyForm.classList.remove("d-none");
-                  splitUnequallyForm.classList.add("d-none");
-                  splitEquallyBtn.classList.remove("btn-secondary");
-                  splitEquallyBtn.classList.add("btn-primary");
-                  splitUnequallyBtn.classList.remove("btn-primary");
-                  splitUnequallyBtn.classList.add("btn-secondary");
-                  isSplitEqual = true;
-                });
-
-                splitUnequallyBtn.addEventListener("click", () => {
-                  splitUnequallyForm.classList.remove("d-none");
-                  splitEquallyForm.classList.add("d-none");
-                  splitUnequallyBtn.classList.remove("btn-secondary");
-                  splitUnequallyBtn.classList.add("btn-primary");
-                  splitEquallyBtn.classList.remove("btn-primary");
-                  splitEquallyBtn.classList.add("btn-secondary");
-                  isSplitEqual = false;
-                });
-
-                transactionForm.addEventListener("submit", function (event) {
-                  try {
-                    let valid = true;
-                    let group_members = document
-                      .getElementById("group_members")
-                      .value.split(",")
-                      .map((x) => x.trim());
-                    if (!isSplitEqual) {
-                      valid = validateUnequalSplit(group_members);
-                    } else {
-                      valid = validateEqualSplit(group_members);
-                    }
-                    if (!valid.valid) {
-                      event.preventDefault();
-                      alert(valid.error);
-                    } else {
-                      document.getElementById("is_split_equally").value =
-                        isSplitEqual;
-                    }
-                  } catch (e) {
-                    console.error(e);
-                    event.preventDefault();
-                    alert("An error encountered!");
-                  }
-                });
-
-                expenseButton.addEventListener("click", function () {
-                  let tableBody = document.querySelector(
-                    "#expensesTable tbody"
-                  );
-                  let groupMembers = document
-                    .getElementById("group_members")
-                    .value.split(",")
-                    .map((x) => x.trim());
-                  let newRow = document.createElement("tr");
-
-                  let byCell = document.createElement("td");
-                  let byInput = document.createElement("select");
-                  byInput.className = "form-select uneven-select";
-                  byInput.name = "expense_by";
-                  let byDefaultOption = document.createElement("option");
-                  byDefaultOption.selected = true;
-                  byInput.appendChild(byDefaultOption);
-                  groupMembers.forEach((member) => {
-                    let byOption = document.createElement("option");
-                    byOption.value = member;
-                    byOption.text = member;
-                    byInput.appendChild(byOption);
-                  });
-                  byCell.appendChild(byInput);
-
-                  let toCell = document.createElement("td");
-                  let toInput = document.createElement("select");
-                  toInput.className = "form-select uneven-select";
-                  toInput.name = "expense_to";
-                  let toDefaultOption = document.createElement("option");
-                  toDefaultOption.selected = true;
-                  toInput.appendChild(toDefaultOption);
-                  groupMembers.forEach((member) => {
-                    let toOption = document.createElement("option");
-                    toOption.value = member;
-                    toOption.text = member;
-                    toInput.appendChild(toOption);
-                  });
-                  toCell.appendChild(toInput);
-                  toCell.appendChild(toInput);
-
-                  let amountCell = document.createElement("td");
-                  let amountInput = document.createElement("input");
-                  amountInput.type = "number";
-                  amountInput.name = "expense_amount";
-                  amountInput.placeholder = "Amount";
-                  amountInput.className = "form-control";
-                  amountInput.min = 0;
-                  amountInput.step = 0.01;
-                  amountCell.appendChild(amountInput);
-
-                  let descriptionCell = document.createElement("td");
-                  let descriptionInput = document.createElement("input");
-                  descriptionInput.type = "text";
-                  descriptionInput.name = "expense_description";
-                  descriptionInput.placeholder = "Description";
-                  descriptionInput.className = "form-control";
-                  descriptionCell.appendChild(descriptionInput);
-
-                  let actionCell = document.createElement("td");
-                  let deleteBtn = document.createElement("button");
-                  deleteBtn.type = "button";
-                  deleteBtn.className = "btn btn-danger";
-                  deleteBtn.textContent = "Delete";
-                  deleteBtn.onclick = () => tableBody.removeChild(newRow);
-                  actionCell.appendChild(deleteBtn);
-
-                  newRow.appendChild(byCell);
-                  newRow.appendChild(toCell);
-                  newRow.appendChild(amountCell);
-                  newRow.appendChild(descriptionCell);
-                  newRow.appendChild(actionCell);
-
-                  tableBody.appendChild(newRow);
-                });
-
-                summarizeButton.addEventListener("click", function (event) {
-                  if (
-                    !confirm(
-                      "Once summarized, the ledger will clear up. This is an irreversible process. Are you sure to proceed?"
-                    )
-                  ) {
-                    event.preventDefault();
-                  }
-                });
-              } catch (e) {
-                event.preventDefault();
-                console.error(e);
-                alert("An error encountered!");
-              }
-            </script>
+            </form>
           </div>
         </div>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+
+<script>
+  function confirmSummarize() {
+    if (confirm('⚠️ WARNING: This action will archive the group and show the transactions as a summary. This will make the group read-only and no other transactions can be logged in the group. Are you sure you want to proceed?')) {
+      window.location.href = '/summarize?groupId={{ group_id }}';
+    }
+  }
+</script>
+
+{% endblock %}

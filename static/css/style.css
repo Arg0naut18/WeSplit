@@ -1,47 +1,881 @@
+:root {
+    /* Light theme */
+    --primary-color: #4a90e2;
+    --secondary-color: #f5f6fa;
+    --accent-color: #34495e;
+    --text-color: #2c3e50;
+    --text-muted: #666;
+    --background-primary: linear-gradient(135deg, #4a90e2 0%, #60519f 100%);
+    --background-secondary: #ffffff;
+    --border-color: #e1e8ed;
+    --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --input-background: #ffffff;
+    --table-header-bg: #f5f6fa;
+    --table-hover: #f8f9fa;
+}
+
+[data-theme="dark"] {
+    /* Dark theme */
+    --primary-color: #60a5fa;
+    --secondary-color: #374151;
+    --accent-color: #e2e8f0;
+    --text-color: #e2e8f0;
+    --text-muted: #9ca3af;
+    --background-primary: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    --background-secondary: #1f2937;
+    --border-color: #4b5563;
+    --error-color: #ef4444;
+    --success-color: #10b981;
+    --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --input-background: #374151;
+    --table-header-bg: #111827;
+    --table-hover: #2d3748;
+    --btn-light-bg: #374151;
+    --btn-light-hover: #4b5563;
+    --btn-light-text: #e2e8f0;
+}
+
 body {
-    background-color: #60519f;
+    background: var(--background-primary);
+    color: var(--text-color);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.group-form, .verify-form, .group-box, .group-url-box, .summary-box {
-    max-width: 700px; /* Adjust the maximum width as needed */
-    min-width: 400px;
-    padding: 25px; /* Add padding inside the form container */
-    border: 2px solid #ccc; /* Optional: Add a border for better visualization */
-    border-radius: 10px; /* Optional: Add rounded corners */
-    background-color: #f8f9fa; /* Optional: Add a background color */
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    background: var(--background-secondary);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--box-shadow);
 }
 
-.names-helper-text {
-    margin-left: 10px;
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Fixed table width for consistent appearance */
+.table-responsive {
+    width: 100%;
+    max-height: 60vh;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+/* Ensure consistent table width across all pages */
+.group-box .table-responsive,
+.summary-box .table-responsive {
+    width: 100%;
+    max-height: 50vh;
+}
+
+/* Fixed table column widths */
+.table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Define specific column widths for consistent appearance */
+.table th:nth-child(1), .table td:nth-child(1) { width: 8%; }   /* # column */
+.table th:nth-child(2), .table td:nth-child(2) { width: 20%; }  /* Paid By / From column */
+.table th:nth-child(3), .table td:nth-child(3) { width: 15%; }  /* Amount column */
+.table th:nth-child(4), .table td:nth-child(4) { width: 25%; }  /* Split Between / To column */
+.table th:nth-child(5), .table td:nth-child(5) { width: 20%; }  /* Description column */
+.table th:nth-child(6), .table td:nth-child(6) { width: 12%; }  /* Date column */
+
+/* Handle text overflow in fixed-width columns */
+.table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.dropdown {
-    position: relative;
+/* Allow description column to wrap for better readability */
+.table td:nth-child(5) {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Desktop table sizing */
+@media (min-width: 769px) {
+    .table-responsive {
+        width: 100%;
+        max-height: 55vh;
+    }
+
+    .group-box .table-responsive,
+    .summary-box .table-responsive {
+        width: 100%;
+        max-height: 50vh;
+    }
+}
+
+/* Mobile table sizing */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .group-form, .verify-form, .group-url-box, .summary-box {
+        min-width: 300px;
+        width: 95vw;
+        max-height: 85vh;
+        padding: 1.5rem;
+    }
+
+    .group-box {
+        width: 98vw;
+        max-height: 85vh;
+        padding: 1.5rem;
+    }
+
+    .table-responsive {
+        width: 100%;
+        max-height: 45vh;
+    }
+
+    .group-box .table-responsive,
+    .summary-box .table-responsive {
+        width: 100%;
+        max-height: 40vh;
+    }
+
+    /* Adjust column widths for mobile */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 10%; }   /* # column */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 18%; }  /* Paid By / From column */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 18%; }  /* Amount column */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 28%; }  /* Split Between / To column */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 18%; }  /* Description column */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 8%; }   /* Date column */
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .group-form, .verify-form, .group-url-box, .summary-box {
+        width: 98vw;
+        max-height: 80vh;
+        padding: 1rem;
+    }
+
+    .group-box {
+        width: 99vw;
+        max-height: 80vh;
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        width: 100%;
+        max-height: 40vh;
+    }
+
+    .group-box .table-responsive,
+    .summary-box .table-responsive {
+        width: 100%;
+        max-height: 35vh;
+    }
+
+    /* Further adjust column widths for small mobile */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 12%; }   /* # column */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 16%; }  /* Paid By / From column */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 20%; }  /* Amount column */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 30%; }  /* Split Between / To column */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 16%; }  /* Description column */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 6%; }   /* Date column */
+}
+
+.card {
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+/* .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+} */
+
+.group-form, .verify-form, .group-url-box, .summary-box {
+    max-width: 700px;
+    min-width: 400px;
+    width: 90vw;
+    max-height: 90vh;
+    padding: 2rem;
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+.group-box {
+    max-width: 1000px;
+    width: 95vw;
+    max-height: 90vh;
+    padding: 2rem;
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+/* Modal styles */
+.expense-modal {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Logo styles */
+.logo-sm {
+    width: 32px;
+    height: auto;
+}
+
+.logo-lg {
+    width: 64px;
+    height: auto;
+}
+
+/* Form control styles */
+.form-textarea {
+    height: 100px;
+}
+
+/* Icon styles */
+.icon-lg {
+    font-size: 3rem;
+}
+
+/* Image styles */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.form-control {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--input-background);
+    color: var(--text-color);
+}
+
+.form-select {
+    background-color: var(--input-background);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: none;
+    outline: none;
+}
+
+.form-select option {
+    background-color: var(--background-secondary);
+    color: var(--text-color);
+}
+
+.form-select option:checked {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.form-select[multiple] {
+    overflow: auto;
+    min-height: 120px;
+}
+
+.form-select[multiple] option:checked {
+    background: var(--primary-color) linear-gradient(0deg, var(--primary-color) 0%, var(--primary-color) 100%);
+    color: white;
+}
+
+/* Input group styling */
+.input-group-text {
+    background-color: var(--btn-light-bg, var(--background-secondary));
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: none;
+    outline: none;
+    background-color: var(--input-background);
+    color: var(--text-color);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    color: var(--background-secondary);
+}
+
+.btn-primary:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 85%, black);
+    transform: translateY(-1px);
+}
+
+.btn-light {
+    background-color: var(--btn-light-bg, var(--background-secondary));
+    border: 1px solid var(--border-color);
+    color: var(--btn-light-text, var(--text-color));
+}
+
+.btn-light:hover {
+    background-color: var(--btn-light-hover, var(--secondary-color));
+    color: var(--btn-light-text, var(--text-color));
+}
+
+[data-theme="dark"] .text-muted {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .text-primary {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .text-success {
+    color: #10b981 !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] label,
+[data-theme="dark"] .form-text {
+    color: var(--text-color);
+}
+
+/* Dark theme modal support */
+[data-theme="dark"] .modal-content {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1);
+}
+
+/* Dark theme alert support */
+[data-theme="dark"] .alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: var(--text-color);
+}
+
+/* Dark theme table header */
+[data-theme="dark"] .table-light {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Override table-light class specifically for dark theme */
+[data-theme="dark"] .table-light th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table-light thead th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Ultra-specific override for the exact table structure */
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 .table-light th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 .table-light thead th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Additional overrides for Bootstrap table header classes */
+[data-theme="dark"] .table thead.table-light th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Force override any Bootstrap header styling */
+[data-theme="dark"] .table th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Dark theme modal table headers */
+[data-theme="dark"] .modal .table th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .modal .table td {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+/* Ensure modal table headers are always readable */
+[data-theme="dark"] .modal .table thead th {
+    background-color: var(--table-header-bg) !important;
+    color: var(--text-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Dark theme modal form elements */
+[data-theme="dark"] .modal .form-select,
+[data-theme="dark"] .modal .form-control {
+    background-color: var(--input-background) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Modal table specific styling - override fixed column widths */
+.modal .table {
+    table-layout: auto !important;
+}
+
+.modal .table th,
+.modal .table td {
+    width: auto !important;
+    min-width: 80px;
+    padding: 0.5rem;
+}
+
+/* Specific column widths for modal table */
+.modal .table th:nth-child(1), .modal .table td:nth-child(1) { width: 20%; }   /* Paid By */
+.modal .table th:nth-child(2), .modal .table td:nth-child(2) { width: 20%; }   /* To */
+.modal .table th:nth-child(3), .modal .table td:nth-child(3) { width: 20%; }   /* Amount */
+.modal .table th:nth-child(4), .modal .table td:nth-child(4) { width: 30%; }   /* Description */
+.modal .table th:nth-child(5), .modal .table td:nth-child(5) { width: 10%; }   /* Actions */
+
+/* Modal table text handling */
+.modal .table td {
+    overflow: visible !important;
+    text-overflow: initial !important;
+    white-space: normal !important;
+}
+
+.modal .table th {
+    overflow: visible !important;
+    text-overflow: initial !important;
+    white-space: normal !important;
+}
+
+[data-theme="dark"] .modal .form-select:focus,
+[data-theme="dark"] .modal .form-control:focus {
+    background-color: var(--input-background) !important;
+    color: var(--text-color) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(96, 165, 250, 0.25) !important;
+}
+
+[data-theme="dark"] .modal .form-select option {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .modal .input-group-text {
+    background-color: var(--secondary-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Dark theme form validation */
+[data-theme="dark"] .invalid-feedback {
+    color: var(--error-color);
+}
+
+[data-theme="dark"] .valid-feedback {
+    color: var(--success-color);
+}
+
+/* Dark theme form check */
+[data-theme="dark"] .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(96, 165, 250, 0.25);
+}
+
+/* Enhanced text contrast for better readability */
+[data-theme="dark"] .text-muted {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .form-text {
+    color: #9ca3af !important;
+}
+
+/* Ensure proper contrast for all text elements */
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .modal-body {
+    color: var(--text-color);
+}
+
+/* Dark theme button improvements */
+[data-theme="dark"] .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Dark theme input group text */
+[data-theme="dark"] .input-group-text {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Light theme improvements for consistency */
+[data-theme="light"] .modal-content {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="light"] .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="light"] .modal-footer {
+    border-top-color: var(--border-color);
+}
+
+/* Ensure consistent button styling across themes */
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Consistent form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(96, 165, 250, 0.25);
 }
 
 .floating-button {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    float: right;
+    box-shadow: var(--box-shadow);
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    transition: all 0.2s ease;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
 }
 
-.uneven-select {
-    width: auto;
-    max-width: 7rem;
+.floating-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
 }
 
-table {
-    border-spacing: 30px;
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.table th {
+    background-color: var(--table-header-bg);
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom-color: var(--border-color);
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom-color: var(--border-color);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--table-hover);
+}
+
+/* Dark theme table improvements */
+[data-theme="dark"] .table-hover tbody tr {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--table-hover) !important;
+    color: var(--text-color) !important;
+}
+
+/* Remove Bootstrap's default alternating row colors in dark theme */
+[data-theme="dark"] .table tbody tr:nth-of-type(odd) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table tbody tr:nth-of-type(even) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+/* Ensure consistent table styling in dark theme */
+[data-theme="dark"] .table {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th {
+    border-bottom-color: var(--border-color) !important;
+}
+
+/* Improve badge contrast in dark theme */
+[data-theme="dark"] .badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Force override Bootstrap table styling in dark theme */
+[data-theme="dark"] .table.table-hover tbody tr {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table.table-hover tbody tr:hover {
+    background-color: var(--table-hover) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table.table-hover tbody tr:nth-child(odd) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table.table-hover tbody tr:nth-child(even) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table.table-hover tbody tr:nth-of-type(odd) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table.table-hover tbody tr:nth-of-type(even) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+/* Override Bootstrap's striped table styling */
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(even) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+/* Ensure all table body cells have consistent styling */
+[data-theme="dark"] .table.table-hover tbody td,
+[data-theme="dark"] .table.table-hover tbody th {
+    background-color: inherit !important;
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+/* Force override any Bootstrap table row styling */
+[data-theme="dark"] .table tbody tr {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table tbody tr td,
+[data-theme="dark"] .table tbody tr th {
+    background-color: inherit !important;
+    color: var(--text-color) !important;
+}
+
+/* Ultra-specific overrides to ensure they take precedence */
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 tbody tr {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 tbody tr:nth-child(odd) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 tbody tr:nth-child(even) {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body .table-responsive .table.table-hover.mb-0 tbody tr:hover {
+    background-color: var(--table-hover) !important;
+    color: var(--text-color) !important;
+}
+
+.badge {
+    transition: all 0.3s ease;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+    color: var(--text-color);
 }
 
 .table-responsive {
-    max-height: 450px;
-    max-width: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.helper-text {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-color);
+}
+
+/* Dark theme scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-color);
 }
