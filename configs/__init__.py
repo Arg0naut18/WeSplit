@@ -12,6 +12,6 @@ class MongoConfigs:
 class EndpointConfigs:
     host = os.environ["HOST"]
     port = os.environ["PORT"]
-    endpoint = f"http://{host}:{port}" if not os.getenv(
+    endpoint = f"https://{host}:{port}" if not os.getenv(
         "ENDPOINT") else os.getenv("ENDPOINT")
     app_key = os.getenv("APP_KEY", "app_key")
