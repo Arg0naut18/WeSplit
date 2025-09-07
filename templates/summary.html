@@ -23,11 +23,12 @@ WeSplit{% endblock %} {% block content %}
                   readonly
                 />
                 <button
-                  class="btn btn-outline-primary"
+                  class="btn btn-outline-primary position-relative"
+                  id="copySummaryBtn"
                   type="button"
-                  onclick="copyToClipboard('summaryUrl')"
+                  onclick="copyToClipboard('summaryUrl','copySummaryBtn')"
                 >
-                  <i class="bi bi-clipboard"></i>
+                  <i class="bi bi-clipboard" id="copySummaryIcon"></i>
                 </button>
               </div>
             </div>
@@ -90,14 +91,28 @@ WeSplit{% endblock %} {% block content %}
   </div>
 
   <script>
-    function copyToClipboard(elementId) {
-      var copyText = document.getElementById(elementId);
-      copyText.select();
-      copyText.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(copyText.value);
+    async function copyToClipboard(inputId, buttonId) {
+      try {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        const icon = button.querySelector("i");
+        const originalIconClasses = icon.className;
+        input.select();
+        input.setSelectionRange(0, 99999);
+        await navigator.clipboard.writeText(input.value);
 
-      // Show tooltip or toast notification
-      alert("Link copied to clipboard!");
+        icon.className = "bi bi-check2";
+        button.disabled = true;
+        setTimeout(() => {
+          icon.className = originalIconClasses;
+          button.disabled = false;
+        }, 1500);
+      } catch (e) {
+        if (window.bootstrap) {
+          const toastEl = document.getElementById("copyToast");
+          if (toastEl) new bootstrap.Toast(toastEl).show();
+        }
+      }
     }
 
     function confirmSimplify() {

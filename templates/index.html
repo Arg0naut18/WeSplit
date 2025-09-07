@@ -98,11 +98,12 @@ endblock %} {% block content %}
           readonly
         />
         <button
-          class="btn btn-outline-primary"
+          class="btn btn-outline-primary position-relative"
           type="button"
-          onclick="copyToClipboard()"
+          id="copyGroupBtn"
+          onclick="copyToClipboard('groupUrl','copyGroupBtn')"
         >
-          <i class="bi bi-clipboard"></i>
+          <i class="bi bi-clipboard" id="copyGroupIcon"></i>
         </button>
       </div>
       <a href="{{ group_url }}" class="btn btn-primary mt-3">
@@ -133,15 +134,31 @@ endblock %} {% block content %}
     });
   })();
 
-  // Copy to clipboard function
-  function copyToClipboard() {
-    var copyText = document.getElementById("groupUrl");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value);
+  // Copy to clipboard with tick feedback
+  async function copyToClipboard(inputId, buttonId) {
+    try {
+      const input = document.getElementById(inputId);
+      const button = document.getElementById(buttonId);
+      const icon = button.querySelector("i");
+      const originalIconClasses = icon.className;
+      input.select();
+      input.setSelectionRange(0, 99999);
+      await navigator.clipboard.writeText(input.value);
 
-    // Show tooltip or toast notification
-    alert("Link copied to clipboard!");
+      // Show tick icon briefly
+      icon.className = "bi bi-check2";
+      button.disabled = true;
+      setTimeout(() => {
+        icon.className = originalIconClasses;
+        button.disabled = false;
+      }, 1500);
+    } catch (e) {
+      // Fallback toast using Bootstrap if clipboard fails
+      if (window.bootstrap) {
+        const toastEl = document.getElementById("copyToast");
+        if (toastEl) new bootstrap.Toast(toastEl).show();
+      }
+    }
   }
 </script>
 {% endblock %}

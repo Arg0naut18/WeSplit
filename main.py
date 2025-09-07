@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from src.service.ledger import Ledger
 from waitress import serve
 from configs import EndpointConfigs
@@ -168,7 +168,8 @@ def create_group():
         f"Create group request received with the group name as {group_name}.")
     group_id = ledger.create_group(
         group_name=group_name, group_members=group_members, description=group_description)
-    group_url = request.url.rsplit("/", 1)[0]+"/group?groupId="+group_id
+    group_url = url_for('group_page', groupId=group_id,
+                        _external=True, _scheme='https')
     logger.info(f"Group successfully created for {group_name}")
     return render_template(template_name_or_list="index.html", group_url=group_url)
 
@@ -195,7 +196,7 @@ def create_record_function():
             f"Unequal split record created successfully for {group_id}")
     ledger.insert_to_ledger(group_id, paid_by, amount,  # pyright: ignore[reportArgumentType]
                             to, description, split_equal)
-    return redirect("/group?groupId={}".format(group_id))
+    return redirect(url_for('group_page', groupId=group_id))
 
 
 @app.route("/summarize", methods=["GET"])
@@ -225,8 +226,8 @@ def summarize_transactions():
         summary = generate_summary(group_details["ledger"])
         archive_group_id = ledger.archive_group(
             group_id=group_id, summary=summary)
-        summary_url = request.url.rsplit(
-            "/", 1)[0]+"/summarize?archiveGroupId="+archive_group_id
+        summary_url = url_for(
+            'summarize_transactions', archiveGroupId=archive_group_id, _external=True, _scheme='https')
         logger.info(
             f"Summarized successfully for {group_details['name']}({group_id})!")
     else:
