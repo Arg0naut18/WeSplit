@@ -144,6 +144,12 @@ body {
         padding: 1rem;
     }
 
+    /* Move theme toggle lower on mobile to avoid notches/status bar */
+    .theme-toggle {
+        top: 4rem;
+        right: 1rem;
+    }
+
     .group-form, .verify-form, .group-url-box, .summary-box {
         min-width: 300px;
         width: 95vw;
@@ -154,12 +160,13 @@ body {
     .group-box {
         width: 98vw;
         max-height: 85vh;
-        padding: 1.5rem;
+        padding: 1.25rem;
     }
 
     .table-responsive {
         width: 100%;
         max-height: 45vh;
+        overflow-x: auto; /* ensure horizontal scroll on small screens */
     }
 
     .group-box .table-responsive,
@@ -168,32 +175,57 @@ body {
         max-height: 40vh;
     }
 
-    /* Adjust column widths for mobile */
-    .table th:nth-child(1), .table td:nth-child(1) { width: 10%; }   /* # column */
-    .table th:nth-child(2), .table td:nth-child(2) { width: 18%; }  /* Paid By / From column */
-    .table th:nth-child(3), .table td:nth-child(3) { width: 18%; }  /* Amount column */
-    .table th:nth-child(4), .table td:nth-child(4) { width: 28%; }  /* Split Between / To column */
-    .table th:nth-child(5), .table td:nth-child(5) { width: 18%; }  /* Description column */
-    .table th:nth-child(6), .table td:nth-child(6) { width: 8%; }   /* Date column */
+    /* On mobile, avoid squeezing columns; allow horizontal scroll instead */
+    .table {
+        table-layout: auto;      /* let columns size to content */
+        min-width: 720px;        /* keep readable column widths */
+    }
+
+    .table th,
+    .table td {
+        white-space: nowrap;     /* prevent vertical letter wrapping */
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    /* Also keep description in a single line on phones for readability */
+    .table td:nth-child(5) {
+        white-space: nowrap;
+        word-wrap: normal;
+        overflow-wrap: normal;
+    }
+
+    /* Slightly reduce typography and controls on mobile */
+    .card h2 { font-size: 1.5rem; }
+    .btn { padding: 0.6rem 1rem; }
+    .logo-lg { width: 56px; }
 }
 
 /* Small mobile devices */
 @media (max-width: 480px) {
+    /* Move the theme toggle further down on very small phones */
+    .theme-toggle {
+        top: 4.5rem;
+        right: 0.75rem;
+    }
+
     .group-form, .verify-form, .group-url-box, .summary-box {
         width: 98vw;
         max-height: 80vh;
         padding: 1rem;
+        min-width: 260px;
     }
 
     .group-box {
         width: 99vw;
         max-height: 80vh;
-        padding: 1rem;
+        padding: 0.875rem;
     }
 
     .table-responsive {
         width: 100%;
         max-height: 40vh;
+        overflow-x: auto; /* reinforce horizontal scroll */
     }
 
     .group-box .table-responsive,
@@ -202,13 +234,22 @@ body {
         max-height: 35vh;
     }
 
-    /* Further adjust column widths for small mobile */
-    .table th:nth-child(1), .table td:nth-child(1) { width: 12%; }   /* # column */
-    .table th:nth-child(2), .table td:nth-child(2) { width: 16%; }  /* Paid By / From column */
-    .table th:nth-child(3), .table td:nth-child(3) { width: 20%; }  /* Amount column */
-    .table th:nth-child(4), .table td:nth-child(4) { width: 30%; }  /* Split Between / To column */
-    .table th:nth-child(5), .table td:nth-child(5) { width: 16%; }  /* Description column */
-    .table th:nth-child(6), .table td:nth-child(6) { width: 6%; }   /* Date column */
+    /* Maintain a minimum width so columns don't collapse */
+    .table {
+        table-layout: auto;
+        min-width: 720px;
+    }
+    .table th,
+    .table td {
+        white-space: nowrap;
+    }
+    .table td:nth-child(5) {
+        white-space: nowrap;
+    }
+
+    .card h2 { font-size: 1.35rem; }
+    .btn { padding: 0.55rem 0.9rem; }
+    .logo-lg { width: 48px; }
 }
 
 .card {
