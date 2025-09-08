@@ -4,84 +4,110 @@ endblock %} {% block content %}
   class="container d-flex align-items-center justify-content-center min-vh-100 py-4"
 >
   {% if not group_url %}
-  <div class="group-form card">
-    <div class="text-center mb-4">
-      <img
-        src="static/images/wesplit-logo.png"
-        alt="WeSplit Logo"
-        class="logo-lg mb-3"
-      />
-      <h2 class="fw-bold">
-        Create a <span class="text-primary">WeSplit</span> Group
-      </h2>
-      <p class="text-muted">Split expenses with friends and family easily</p>
-    </div>
+  <div class="d-flex flex-column align-items-center">
+    <div class="group-form card">
+      <div class="text-center mb-4">
+        <img
+          src="{{ url_for('static', filename='images/wesplit-logo.png') }}"
+          alt="WeSplit Logo"
+          class="logo-lg mb-3"
+        />
+        <h2 class="fw-bold">
+          Create a <span class="text-primary">WeSplit</span> Group
+        </h2>
+        <p class="text-muted">Split expenses with friends and family easily</p>
+      </div>
 
-    <form
-      action="/create-group"
-      method="POST"
-      class="needs-validation"
-      novalidate
-    >
-      <div class="mb-4">
-        <div class="form-floating">
+      <form
+        action="/create-group"
+        method="POST"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="mb-4">
+          <div class="form-floating">
+            <input
+              type="text"
+              class="form-control"
+              id="groupName"
+              name="groupName"
+              placeholder="My Group"
+              required
+              pattern="^[a-zA-Z0-9\s-_]{3,50}$"
+            />
+            <label for="groupName"
+              ><i class="bi bi-people-fill me-2"></i>Group Name</label
+            >
+            <div class="invalid-feedback">
+              Please enter a valid group name (3-50 characters)
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="form-floating">
+            <textarea
+              class="form-control form-textarea"
+              id="nameTextarea"
+              name="names"
+              placeholder="Enter names"
+              required
+            ></textarea>
+            <label for="nameTextarea"
+              ><i class="bi bi-person-fill me-2"></i>Participants</label
+            >
+            <small class="helper-text"
+              >Enter participant names, separated by commas</small
+            >
+            <div class="invalid-feedback">
+              Please enter at least two participants
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="form-floating">
+            <textarea
+              class="form-control form-textarea"
+              id="groupDescription"
+              name="groupDescription"
+              placeholder="Enter description"
+            ></textarea>
+            <label for="groupDescription"
+              ><i class="bi bi-card-text me-2"></i>Description
+              (Optional)</label
+            >
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3">
+          <i class="bi bi-plus-circle-fill me-2"></i>Create Group
+        </button>
+      </form>
+    </div>
+    <div class="open-group-form card mt-4">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold fs-4">
+          Open an <span class="text-primary">Existing</span> Group
+        </h2>
+        <p class="text-muted">Want to modify an existing group? Enter the group ID or URL.</p>
+      </div>
+      <form id="joinGroupForm">
+        <div class="form-floating mb-3">
           <input
             type="text"
             class="form-control"
-            id="groupName"
-            name="groupName"
-            placeholder="My Group"
+            id="groupIdInput"
+            placeholder="Group ID or URL"
             required
-            pattern="^[a-zA-Z0-9\s-_]{3,50}$"
           />
-          <label for="groupName"
-            ><i class="bi bi-people-fill me-2"></i>Group Name</label
-          >
-          <div class="invalid-feedback">
-            Please enter a valid group name (3-50 characters)
-          </div>
+          <label for="groupIdInput"><i class="bi bi-people-fill me-2"></i>Group ID or URL</label>
         </div>
-      </div>
-
-      <div class="mb-4">
-        <div class="form-floating">
-          <textarea
-            class="form-control form-textarea"
-            id="nameTextarea"
-            name="names"
-            placeholder="Enter names"
-            required
-          ></textarea>
-          <label for="nameTextarea"
-            ><i class="bi bi-person-fill me-2"></i>Participants</label
-          >
-          <small class="helper-text"
-            >Enter participant names, separated by commas</small
-          >
-          <div class="invalid-feedback">
-            Please enter at least two participants
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <div class="form-floating">
-          <textarea
-            class="form-control form-textarea"
-            id="groupDescription"
-            name="groupDescription"
-            placeholder="Enter description"
-          ></textarea>
-          <label for="groupDescription"
-            ><i class="bi bi-card-text me-2"></i>Description (Optional)</label
-          >
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100 py-3">
-        <i class="bi bi-plus-circle-fill me-2"></i>Create Group
-      </button>
-    </form>
+        <button type="submit" class="btn btn-primary w-100 py-3">
+          <i class="bi bi-arrow-right-circle-fill me-2"></i>Open Group
+        </button>
+      </form>
+    </div>
   </div>
   {% else %}
   <div class="group-url-box card text-center">
@@ -198,4 +224,5 @@ endblock %} {% block content %}
     }
   }
 </script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

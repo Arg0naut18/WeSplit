@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from src.service.ledger import Ledger
 from waitress import serve
 from configs import EndpointConfigs
-from typing import List, Dict
+from typing import List, Dict, Any
 from src.utils.logger import logger
 from collections import defaultdict
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -17,8 +17,7 @@ ledger = Ledger()
 HOME_PATH = "/home"
 
 
-# pyright: ignore[reportGeneralTypeIssues]
-def generate_summary(ledger: List[Dict[str, any]]) -> List[Dict[str, any]]:
+def generate_summary(ledger: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     data_dict = {}
     for data in ledger:
         original_key = data["by"]+"->"+data["to"]
@@ -107,8 +106,7 @@ def simplify(transactions):
     return simplified
 
 
-# pyright: ignore[reportGeneralTypeIssues]
-def get_summary(group_id, group_details, wants_simplified) -> tuple[bool, List[Dict[str, any]]]:
+def get_summary(group_id, group_details, wants_simplified) -> tuple[bool, List[Dict[str, Any]]]:
     if wants_simplified:
         if "simplified" in group_details:
             return True, group_details["simplified"]
@@ -160,8 +158,7 @@ def group_page():
 @app.route("/create-group", methods=["POST"])
 def create_group():
     group_name = request.form.get("groupName", "")
-    group_members = [name.strip()
-                     for name in request.form.get("names", "").split(",")]
+    group_members = [name.strip() for name in request.form.get("names", "").split(",")]
     group_description = request.form.get(
         "groupDescription") if request.form.get("groupDescription") else None
     logger.info(

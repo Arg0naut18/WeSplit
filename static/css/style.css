@@ -260,11 +260,6 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
-} */
-
 .group-form, .verify-form, .group-url-box, .summary-box {
     max-width: 700px;
     min-width: 400px;
@@ -288,6 +283,27 @@ body {
     box-shadow: var(--box-shadow);
     border: 1px solid var(--border-color);
     overflow-y: auto;
+}
+
+.open-group-form {
+    max-width: 500px;
+    min-width: 300px;
+    width: 90vw;
+    padding: 1.5rem;
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.open-group-form:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .open-group-form:hover {
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* Modal styles */
